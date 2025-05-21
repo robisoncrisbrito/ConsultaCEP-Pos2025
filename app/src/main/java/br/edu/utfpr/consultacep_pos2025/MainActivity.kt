@@ -5,11 +5,18 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import br.edu.utfpr.consultacep_pos2025.api.RetrofitClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var etCEP: EditText
     private lateinit var tvResposta: TextView
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,8 +27,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun btConsultarCEPOnClik(view: View) {
-        Thread {
 
-        }.start()
+        lifecycleScope.launch(Dispatchers.IO ) {
+            val cep = etCEP.text.toString()
+
+            val endereco = RetrofitClient.viaCEPService.buscarCEP(cep)
+
+            withContext(Dispatchers.Main ) {
+                tvResposta.text = "${endereco.logradouro}  ${endereco.bairro}"
+            }
+
+        }
+
     }
 }
